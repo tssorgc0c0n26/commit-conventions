@@ -1,0 +1,33 @@
+name: Lint PR Title
+
+# Changelog and the release-notes job key off chore/fix/feat.
+# COMMITLINT_TOKEN is the repo credential. COMMITLINT_SHARED_TOKEN is the org
+# credential shared with this repository.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  lint_pr_title:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR Title
+        env:
+          COMMITLINT_TOKEN: ${{ secrets.COMMITLINT_TOKEN }}
+          COMMITLINT_SHARED_TOKEN: ${{ secrets.COMMITLINT_SHARED_TOKEN }}
+        run: |
+          title="${{ github.event.pull_request.title }}"
+          echo "$title"
+          if [[ $title =~ ^(chore|fix|feat) ]]; then
+            echo "PR title starts with chore, fix, or feat"
+            exit 0
+          else
+            echo "PR title did not start with chore, fix, or feat"
+            exit 1
+          fi
